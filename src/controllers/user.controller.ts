@@ -45,7 +45,7 @@ export class UserController {
           schema: getModelSchemaRef(User, {
             title: 'NewUser',
             exclude: ['id'],
-            optional: ['createdAt', 'updatedAt', 'deletedAt', 'password', 'username', 'birthdate']
+            optional: ['createdAt', 'updatedAt', 'deletedAt']
           }),
         },
       },
