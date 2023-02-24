@@ -193,7 +193,12 @@ export class UserController {
   async find(
     @param.filter(User) filter?: Filter<User>,
   ): Promise<User[]> {
-    return this.userRepository.find(filter);
+    // delete password
+    let users = await this.userRepository.find(filter);
+    users.forEach(user => {
+      delete user.password;
+    });
+    return users;
   }
 
   @patch('/users')
