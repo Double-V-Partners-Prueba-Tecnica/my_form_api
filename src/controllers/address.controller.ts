@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -25,6 +26,7 @@ export class AddressController {
     description: 'Address model instance',
     content: {'application/json': {schema: getModelSchemaRef(Address)}},
   })
+  @authenticate('jwt')
   async create(
     @requestBody({
       content: {
@@ -55,6 +57,7 @@ export class AddressController {
     description: 'Address model count',
     content: {'application/json': {schema: CountSchema}},
   })
+  @authenticate('jwt')
   async count(
     @param.where(Address) where?: Where<Address>,
   ): Promise<Count> {
@@ -73,6 +76,7 @@ export class AddressController {
       },
     },
   })
+  @authenticate('jwt')
   async find(
     @param.filter(Address) filter?: Filter<Address>,
   ): Promise<Address[]> {
@@ -114,6 +118,7 @@ export class AddressController {
       },
     },
   })
+  @authenticate('jwt')
   async findById(
     @param.path.string('id') id: string,
     @param.filter(Address, {exclude: 'where'}) filter?: FilterExcludingWhere<Address>
@@ -125,6 +130,7 @@ export class AddressController {
   @response(204, {
     description: 'Address PATCH success',
   })
+  @authenticate('jwt')
   async updateById(
     @param.path.string('id') id: string,
     @requestBody({
@@ -151,6 +157,7 @@ export class AddressController {
   @response(204, {
     description: 'Address PUT success',
   })
+  @authenticate('jwt')
   async replaceById(
     @param.path.string('id') id: string,
     @requestBody() address: Address,
@@ -166,6 +173,7 @@ export class AddressController {
   @response(204, {
     description: 'Address DELETE success',
   })
+  @authenticate('jwt')
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     // await this.addressRepository.deleteById(id);
     // Validar si llega deletedAt, si no llegan se les asigna el valor de la fecha actual
