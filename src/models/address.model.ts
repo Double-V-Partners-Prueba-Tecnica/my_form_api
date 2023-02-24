@@ -20,6 +20,22 @@ export class Address extends Entity {
   })
   userId?: string;
 
+  // timestamp
+  @property({
+    type: 'date',
+  })
+  createdAt?: string;
+
+  @property({
+    type: 'date',
+  })
+  updatedAt?: string;
+
+  @property({
+    type: 'date',
+  })
+  deletedAt?: string | undefined;
+
   constructor(data?: Partial<Address>) {
     super(data);
   }

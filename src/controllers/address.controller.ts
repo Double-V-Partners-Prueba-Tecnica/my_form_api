@@ -4,18 +4,12 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {Address} from '../models';
 import {AddressRepository} from '../repositories';
@@ -23,8 +17,8 @@ import {AddressRepository} from '../repositories';
 export class AddressController {
   constructor(
     @repository(AddressRepository)
-    public addressRepository : AddressRepository,
-  ) {}
+    public addressRepository: AddressRepository,
+  ) { }
 
   @post('/addresses')
   @response(200, {
@@ -38,12 +32,21 @@ export class AddressController {
           schema: getModelSchemaRef(Address, {
             title: 'NewAddress',
             exclude: ['id'],
+            optional: ['createdAt', 'updatedAt', 'deletedAt']
           }),
         },
       },
     })
     address: Omit<Address, 'id'>,
   ): Promise<Address> {
+    // Validar si llega createdAt, updatedAt, si no llegan se les asigna el valor de la fecha actual
+    if (!address.createdAt) {
+      address.createdAt = new Date().toISOString();
+    }
+    if (!address.updatedAt) {
+      address.updatedAt = new Date().toISOString();
+    }
+
     return this.addressRepository.create(address);
   }
 
@@ -85,13 +88,20 @@ export class AddressController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Address, {partial: true}),
+          schema: getModelSchemaRef(Address, {
+            partial: true,
+            optional: ['createdAt', 'updatedAt', 'deletedAt']
+          }),
         },
       },
     })
     address: Address,
     @param.where(Address) where?: Where<Address>,
   ): Promise<Count> {
+    // Validar si llega updatedAt, si no llegan se les asigna el valor de la fecha actual
+    if (!address.updatedAt) {
+      address.updatedAt = new Date().toISOString();
+    }
     return this.addressRepository.updateAll(address, where);
   }
 
@@ -120,12 +130,20 @@ export class AddressController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Address, {partial: true}),
+          schema: getModelSchemaRef(Address, {
+            partial: true,
+            optional: ['createdAt', 'updatedAt', 'deletedAt']
+          }),
         },
       },
     })
     address: Address,
   ): Promise<void> {
+    // Validar si llega updatedAt, si no llegan se les asigna el valor de la fecha actual
+    if (!address.updatedAt) {
+      address.updatedAt = new Date().toISOString();
+    }
+
     await this.addressRepository.updateById(id, address);
   }
 
@@ -137,6 +155,10 @@ export class AddressController {
     @param.path.string('id') id: string,
     @requestBody() address: Address,
   ): Promise<void> {
+    // Validar si llega updatedAt, si no llegan se les asigna el valor de la fecha actual
+    if (!address.updatedAt) {
+      address.updatedAt = new Date().toISOString();
+    }
     await this.addressRepository.replaceById(id, address);
   }
 
@@ -145,6 +167,12 @@ export class AddressController {
     description: 'Address DELETE success',
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.addressRepository.deleteById(id);
+    // await this.addressRepository.deleteById(id);
+    // Validar si llega deletedAt, si no llegan se les asigna el valor de la fecha actual
+    const address = await this.addressRepository.findById(id);
+    if (!address.deletedAt) {
+      address.deletedAt = new Date().toISOString();
+    }
+    await this.addressRepository.updateById(id, address);
   }
 }
